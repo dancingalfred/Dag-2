@@ -16,10 +16,11 @@ def calculate_driving_times_for_each_speed(distance,list_of_speeds,normal_usage)
     
 
 def calculate_multiplier_lower_temps(temperature):
-    extra_usage = 1  
+    extra_usage = 0  
     if temperature < 10:
+        extra_usage = 1
         extra_usage_multiplyer = abs(10 - temperature)
-        extra_usage += (extra_usage_multiplyer * 0.1)
+        extra_usage += extra_usage_multiplyer #(extra_usage_multiplyer * 0.001) < - - - - - HÄR MED (KANSKE)
     return extra_usage
 
         
@@ -27,22 +28,22 @@ def optimal_speed(distance,temperature,list_of_speeds,normal_usage):
     
     calculate_driving_times_for_each_speed(distance,list_of_speeds,normal_usage)
     multiplier = calculate_multiplier_lower_temps(temperature)
-    for speed in list_of_speeds:
+    for speed in list_of_speeds:        
         normal_usage[speed]["final usage"] = (normal_usage[speed]["usage per km"] * distance) + (normal_usage[speed]["time"] * multiplier)
     
     #flitrate under 0 and over 28 usage
-    filtered_dict = {key: value for key, value in normal_usage.items() if 0 <= value["final usage"] <= 28}
+    filtered_dict = {key: value for key, value in normal_usage.items() if 0 <= value["final usage"] <= 28.00001}  # < - - - HÄR ÄR ETT PROBLEM
     if not filtered_dict:
         return None
     
     if filtered_dict != None:
         min_key = min(filtered_dict, key=lambda key: filtered_dict[key]["final usage"])
     
-    return min_key, filtered_dict[min_key]["final usage"]
+        return min_key, filtered_dict[min_key]["final usage"]
 
 
 if __name__ == "__main__":
-    distance_to_go = 10
+    distance_to_go = 200
     temp = 20
     optimal_car_speed, usage = (optimal_speed(distance_to_go,temp,list_of_speeds,normal_usage))
     if optimal_car_speed != None:
